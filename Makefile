@@ -6,7 +6,7 @@
 #    By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/03 20:40:19 by ohaker            #+#    #+#              #
-#    Updated: 2025/07/07 20:33:24 by ohaker           ###   ########.fr        #
+#    Updated: 2025/07/25 16:22:44 by ohaker           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -54,7 +54,7 @@ mygit:
 	else \
 		TIMESTAMP=$$(date '+%Y-%m-%d %H:%M'); \
 		git commit -m "$$input" -m "Commit date: $$TIMESTAMP"; \
-		git push origin main; \
+		git push origin master; \
 		echo "$(GREEN)		- Pushed to git$(NONE)"; \
 	fi
 
