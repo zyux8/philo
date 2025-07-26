@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 20:28:20 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/23 03:00:37 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/07/25 17:36:54 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,14 +51,36 @@ long get_time_diff(struct timeval start)
 	return (time_diff);
 }
 
-void ft_usleep(long sleep)
+void	ft_usleep(long sleep, t_philo *philo)
 {
-	long temp;
+	long	start;
+	long	current;
 
-	temp = sleep / 100;
-	while (temp <= sleep && philo.alive)
+	start = get_time_diff(philo->rules->start_time);
+	while (1)
 	{
-		usleep(temp);
-		temp += sleep / 100;
+		pthread_mutex_lock(&philo->rules->simulation_lock);
+		if (philo->rules->stop_simulation)
+		{
+			pthread_mutex_unlock(&philo->rules->simulation_lock);
+			break;
+		}
+		pthread_mutex_unlock(&philo->rules->simulation_lock);
+
+		current = get_time_diff(philo->rules->start_time);
+		if (current - start >= sleep)
+			break;
+		usleep(sleep / 100);
 	}
+}
+
+void printf_safe(t_philo *philo, char *msg)
+{
+	long	time_diff;
+
+	pthread_mutex_lock(&philo->rules->write_lock);
+	time_diff = get_time_diff(philo->rules->start_time);
+	if (check_alive(philo->rules))
+		printf("%ld %d %s\n", time_diff, philo->id, msg);
+	pthread_mutex_unlock(&philo->rules->write_lock);
 }

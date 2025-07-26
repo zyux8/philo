@@ -6,7 +6,7 @@
 #    By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/03 20:40:19 by ohaker            #+#    #+#              #
-#    Updated: 2025/07/25 16:22:44 by ohaker           ###   ########.fr        #
+#    Updated: 2025/07/25 17:40:57 by ohaker           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,9 @@ NAME = philo
 CFLAGS = -pthread
 SRC = $(addprefix src/, \
 	main.c \
-	utils.c)
+	utils.c \
+	checks.c \
+	routines.c)
 OBJ = $(SRC:.c=.o)
 
 NONE		= \033[0m
