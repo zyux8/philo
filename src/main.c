@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 20:51:15 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/26 20:12:36 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/08/02 20:27:23 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,9 @@ int init_input(int argc, char **argv, t_philo *philo)
 	while (x < ft_atoi(argv[1]))
 		pthread_mutex_init(&philo->rules->forks[x++], NULL);
 	pthread_mutex_init(&philo->rules->print_lock, NULL);
+	pthread_mutex_init(&philo->rules->alive_lock, NULL);
+	pthread_mutex_init(&philo->rules->meal_lock, NULL);
 	pthread_mutex_init(&philo->rules->simulation_lock, NULL);
-	pthread_mutex_init(&philo->rules->write_lock, NULL);
 	return (0);
 }
 
@@ -47,6 +48,7 @@ int init_philos(t_philo *philo)
 	philo->rules->philos = malloc(sizeof(t_philo) * philo->rules->philo_count);
 	if (!philo->rules->philos)
 		error_msg("Memory allocation of philos failes.\n");
+	gettimeofday(&philo->rules->start_time, NULL);
 	while (x < philo->rules->philo_count)
 	{
 		philo->rules->philos[x].rules = philo->rules;
@@ -56,45 +58,6 @@ int init_philos(t_philo *philo)
 		philo->rules->philos[x].last_meal = philo->rules->start_time;
 		philo->rules->philos[x].left_fork = &philo->rules->forks[x];
 		philo->rules->philos[x].right_fork = &philo->rules->forks[(x + 1) % philo->rules->philo_count];
-		x++;
-	}
-	gettimeofday(&philo->rules->start_time, NULL);
-	return (0);
-}
-
-void *philo_routine(void *arg)
-{
-	t_philo *philo = (t_philo *)arg;
-
-	if (philo->id % 2 == 0)
-		usleep(1000);
-	while(check_alive(philo->rules))
-	{
-		philo_think(philo);
-		if (philo_fork(philo))
-		{
-			philo_eat(philo);
-			philo_sleep(philo);
-		}
-		else
-			pthread_exit(NULL);
-	}
-	return (NULL);
-}
-
-int thread_create(t_rules *rules)
-{
-	int x;
-
-	x = 0;
-	if (rules->philo_count == 1)
-	{
-		pthread_create(&rules->philos[x].thread_id, NULL, one_philo, &rules->philos[x]);
-		return (0);
-	}
-	while (x < rules->philo_count)
-	{
-		pthread_create(&rules->philos[x].thread_id, NULL, philo_routine, &rules->philos[x]);
 		x++;
 	}
 	return (0);
@@ -111,6 +74,9 @@ int main(int argc, char **argv)
 	init_input(argc, argv, &philo);
 	init_philos(&philo);
 	thread_create(philo.rules);
+	check_end(philo.rules);
+	thread_join(philo.rules);
+	clean_up(&philo);
 	// printf("philos: %d\ndie: %d\neat: %d\nsleep: %d\ncount: %d\n", philo.rules->philo_count, philo.rules->time_to_die, philo.rules->time_to_eat, philo.rules->time_to_sleep, philo.rules->must_eat_count);
 	return (0);
 }

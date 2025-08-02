@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 20:28:20 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/25 17:36:54 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/07/30 19:03:54 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,10 +77,17 @@ void	ft_usleep(long sleep, t_philo *philo)
 void printf_safe(t_philo *philo, char *msg)
 {
 	long	time_diff;
-
-	pthread_mutex_lock(&philo->rules->write_lock);
+	
 	time_diff = get_time_diff(philo->rules->start_time);
+	pthread_mutex_lock(&philo->rules->print_lock);
 	if (check_alive(philo->rules))
 		printf("%ld %d %s\n", time_diff, philo->id, msg);
-	pthread_mutex_unlock(&philo->rules->write_lock);
+	pthread_mutex_unlock(&philo->rules->print_lock);
+}
+
+void set_stop_sim(t_rules *rules)
+{
+	pthread_mutex_lock(&rules->simulation_lock);
+	rules->stop_simulation = 1;
+	pthread_mutex_unlock(&rules->simulation_lock);
 }

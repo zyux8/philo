@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 16:31:32 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/26 20:18:21 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/07/30 18:17:30 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,9 @@ void philo_eat(t_philo *philo)
 	ft_usleep(philo->rules->time_to_eat * 1000, philo);
 	pthread_mutex_unlock(philo->left_fork);
 	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_lock(&philo->rules->meal_lock);
 	philo->meals_eaten += 1;
+	pthread_mutex_unlock(&philo->rules->meal_lock);
 }
 
 void philo_sleep(t_philo *philo)

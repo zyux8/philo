@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 16:24:51 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/26 20:17:34 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/07/30 19:52:22 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,11 @@ int check_input(int argc, char **argv)
 	int y;
 
 	if (argc < 5 || argc > 6)
-	error_msg("Invalid number of arguments.\n");
+		error_msg("Invalid number of arguments.\n");
+	if (argv[1] == 0)
+		error_msg("Impossible number of philosophers.\n");
+	if (argc == 6 && argv[5] == 0)
+		error_msg("Impossible number of must-have meals.\n");
 	x = 1;
 	while (argv[x])
 	{
@@ -45,7 +49,7 @@ int check_alive(t_rules *rules)
 		if (!rules->philos[x].alive)
 		{
 			printf_safe(&rules->philos[x], "died\n");
-			rules->stop_simulation = 1;
+			set_stop_sim(rules);
 			pthread_mutex_unlock(&rules->alive_lock);
 			return (0);
 		}
@@ -79,7 +83,7 @@ int check_end(t_rules *rules)
 	int x;
 	long time_diff;
 
-	while (!rules->stop_simulation)
+	while (1)
 	{
 		x = 0;
 		while (x < rules->philo_count)
@@ -90,15 +94,15 @@ int check_end(t_rules *rules)
 			if (time_diff > rules->time_to_eat)
 			{
 				printf_safe(&rules->philos[x], "died\n");
-				rules->stop_simulation = 1;
-				return (0);
+				set_stop_sim(rules);
+				break;
 			}
 			x++;
 		}
 		if (rules->must_eat_count > 0 && all_eaten(rules))
 		{
-			rules->stop_simulation = 1;
-			return (0);
+			set_stop_sim(rules);
+			break;
 		}
 		usleep(1000);
 	}
