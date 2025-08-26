@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 20:51:15 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/02 20:27:23 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/08/26 19:26:26 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 int init_input(int argc, char **argv, t_philo *philo)
 {
 	int x;
-	int y;
 
 	x = 0;
-	y = 0;
 	philo->rules->philo_count = ft_atoi(argv[1]);
 	philo->rules->time_to_die = ft_atoi(argv[2]);
 	philo->rules->time_to_eat = ft_atoi(argv[3]);
@@ -33,9 +31,9 @@ int init_input(int argc, char **argv, t_philo *philo)
 		error_msg("Memory allocation for forks failed.\n");
 	while (x < ft_atoi(argv[1]))
 		pthread_mutex_init(&philo->rules->forks[x++], NULL);
-	pthread_mutex_init(&philo->rules->print_lock, NULL);
 	pthread_mutex_init(&philo->rules->alive_lock, NULL);
 	pthread_mutex_init(&philo->rules->meal_lock, NULL);
+	pthread_mutex_init(&philo->rules->print_lock, NULL);
 	pthread_mutex_init(&philo->rules->simulation_lock, NULL);
 	return (0);
 }

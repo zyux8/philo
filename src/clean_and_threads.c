@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 18:53:57 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/02 20:15:12 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/08/25 17:38:15 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,17 @@ void *philo_routine(void *arg)
 {
 	t_philo *philo = (t_philo *)arg;
 
-	if (philo->id % 2 == 0)
-		usleep(1000);
+	// if (philo->id % 2 == 0)
+	// 	usleep(1000);
 	while(check_alive(philo->rules))
 	{
-		philo_think(philo);
+		if (get_stop_sim(philo->rules))
+			break;
 		if (philo_fork(philo))
 		{
 			philo_eat(philo);
 			philo_sleep(philo);
+			philo_think(philo);
 		}
 		else
 			pthread_exit(NULL);

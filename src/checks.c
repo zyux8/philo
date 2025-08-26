@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 16:24:51 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/30 19:52:22 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/08/26 19:06:49 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ int check_input(int argc, char **argv)
 
 	if (argc < 5 || argc > 6)
 		error_msg("Invalid number of arguments.\n");
-	if (argv[1] == 0)
+	if (ft_atoi(argv[1]) == 0)
 		error_msg("Impossible number of philosophers.\n");
-	if (argc == 6 && argv[5] == 0)
+	if (argc == 6 && ft_atoi(argv[5]) == 0)
 		error_msg("Impossible number of must-have meals.\n");
 	x = 1;
 	while (argv[x])
@@ -41,14 +41,18 @@ int check_input(int argc, char **argv)
 int check_alive(t_rules *rules)
 {
 	int x;
-
+	long time_diff;
+	
 	x = 0;
 	pthread_mutex_lock(&rules->alive_lock);
 	while (x < rules->philo_count)
 	{
-		if (!rules->philos[x].alive)
+		pthread_mutex_lock(&rules->meal_lock);
+		time_diff = get_time_diff(rules->philos[x].last_meal);
+		pthread_mutex_unlock(&rules->meal_lock);
+		if (time_diff > rules->time_to_die)
 		{
-			printf_safe(&rules->philos[x], "died\n");
+			printf_safe(&rules->philos[x], "di3d");
 			set_stop_sim(rules);
 			pthread_mutex_unlock(&rules->alive_lock);
 			return (0);
@@ -80,31 +84,17 @@ int all_eaten(t_rules *rules)
 
 int check_end(t_rules *rules)
 {
-	int x;
 	long time_diff;
 
-	while (1)
+	while (!get_stop_sim(rules))
 	{
-		x = 0;
-		while (x < rules->philo_count)
-		{
-			pthread_mutex_lock(&rules->meal_lock);
-			time_diff = get_time_diff(rules->philos[x].last_meal);
-			pthread_mutex_unlock(&rules->meal_lock);
-			if (time_diff > rules->time_to_eat)
-			{
-				printf_safe(&rules->philos[x], "died\n");
-				set_stop_sim(rules);
-				break;
-			}
-			x++;
-		}
-		if (rules->must_eat_count > 0 && all_eaten(rules))
+		check_alive(rules);
+		if (rules->must_eat_count > 0 && all_eaten(rules) )
 		{
 			set_stop_sim(rules);
-			break;
+			return (0);
 		}
-		usleep(1000);
+		usleep(10000);
 	}
 	return (0);
 }

@@ -6,17 +6,18 @@
 #    By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/03 20:40:19 by ohaker            #+#    #+#              #
-#    Updated: 2025/07/25 17:40:57 by ohaker           ###   ########.fr        #
+#    Updated: 2025/08/22 22:27:10 by ohaker           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
-CFLAGS = -pthread
+CFLAGS = -pthread #-Werror -Wextra -Wall
 SRC = $(addprefix src/, \
 	main.c \
 	utils.c \
 	checks.c \
-	routines.c)
+	routines.c \
+	clean_and_threads.c)
 OBJ = $(SRC:.c=.o)
 
 NONE		= \033[0m
@@ -29,27 +30,27 @@ ORANGE		= \033[33;01m
 all:	$(NAME)
 
 $(NAME): $(OBJ)
-	@echo "$(ORANGE)		- Compiling $(NAME)...$(NONE)"
-	@gcc $(CFLAGS) $(OBJ) -lpthread -o $(NAME)
-	@echo "$(GREEN)		- $(NAME) Compiled -$(NONE)"
+	echo "$(ORANGE)		- Compiling $(NAME)...$(NONE)"
+	gcc $(CFLAGS) $(OBJ) -lpthread -o $(NAME)
+	echo "$(GREEN)		- $(NAME) Compiled -$(NONE)"
 
 %.o: %.c
-	@gcc $(CFLAGS) -c $< -o $@
+	gcc $(CFLAGS) -c $< -o $@
 
 clean:
-	@rm -rf $(OBJ)
-	@echo "$(ORANGE)		- Deleted object files$(NONE)"
+	rm -rf $(OBJ)
+	echo "$(ORANGE)		- Deleted object files$(NONE)"
 
 fclean: clean
-	@rm -f $(NAME)
-	@echo "$(ORANGE)		- Deleted $(NAME)$(NONE)"
+	rm -f $(NAME)
+	echo "$(ORANGE)		- Deleted $(NAME)$(NONE)"
 
 re: fclean all
 
 mygit:
-	@git add .
-	@git status
-	@echo "$(ORANGE)		- Enter commit message:$(NONE)"; \
+	git add .
+	git status
+	echo "$(ORANGE)		- Enter commit message:$(NONE)"; \
 	read input; \
 	if [ -z "$$input" ]; then \
 		echo "$(RED)		- No commit message entered. Exiting.$(NONE)"; \

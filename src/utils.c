@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 20:28:20 by ohaker            #+#    #+#             */
-/*   Updated: 2025/07/30 19:03:54 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/08/25 18:04:31 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,28 +51,42 @@ long get_time_diff(struct timeval start)
 	return (time_diff);
 }
 
-void	ft_usleep(long sleep, t_philo *philo)
+// void	ft_usleep(long sleep, t_philo *philo)
+// {
+// 	long	start;
+// 	long	current;
+
+// 	start = get_time_diff(philo->rules->start_time);
+// 	while (1)
+// 	{
+// 		// pthread_mutex_lock(&philo->rules->simulation_lock);
+// 		// if (philo->rules->stop_simulation)
+// 		// {
+// 		// 	pthread_mutex_unlock(&philo->rules->simulation_lock);
+// 		// 	break;
+// 		// }
+// 		// pthread_mutex_unlock(&philo->rules->simulation_lock);
+
+// 		current = get_time_diff(philo->rules->start_time);
+// 		if (current - start >= sleep)
+// 			break;
+// 		usleep(100);
+// 	}
+// }
+
+void ft_usleep(long sleep, t_philo *philo)
 {
-	long	start;
-	long	current;
+    long start;
 
 	start = get_time_diff(philo->rules->start_time);
-	while (1)
+    while (get_time_diff(philo->rules->start_time) - start < sleep)
 	{
-		pthread_mutex_lock(&philo->rules->simulation_lock);
-		if (philo->rules->stop_simulation)
-		{
-			pthread_mutex_unlock(&philo->rules->simulation_lock);
-			break;
-		}
-		pthread_mutex_unlock(&philo->rules->simulation_lock);
-
-		current = get_time_diff(philo->rules->start_time);
-		if (current - start >= sleep)
-			break;
-		usleep(sleep / 100);
-	}
+        if (get_stop_sim(philo->rules))
+            break;
+        usleep(100);
+    }
 }
+
 
 void printf_safe(t_philo *philo, char *msg)
 {
@@ -80,7 +94,7 @@ void printf_safe(t_philo *philo, char *msg)
 	
 	time_diff = get_time_diff(philo->rules->start_time);
 	pthread_mutex_lock(&philo->rules->print_lock);
-	if (check_alive(philo->rules))
+	if (check_alive(philo->rules) && philo->rules->stop_simulation == 0)
 		printf("%ld %d %s\n", time_diff, philo->id, msg);
 	pthread_mutex_unlock(&philo->rules->print_lock);
 }
@@ -90,4 +104,14 @@ void set_stop_sim(t_rules *rules)
 	pthread_mutex_lock(&rules->simulation_lock);
 	rules->stop_simulation = 1;
 	pthread_mutex_unlock(&rules->simulation_lock);
+}
+
+int get_stop_sim(t_rules *rules)
+{
+    int value;
+
+    pthread_mutex_lock(&rules->simulation_lock);
+    value = rules->stop_simulation;
+    pthread_mutex_unlock(&rules->simulation_lock);
+    return (value);
 }
