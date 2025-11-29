@@ -6,18 +6,19 @@
 #    By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/03 20:40:19 by ohaker            #+#    #+#              #
-#    Updated: 2025/09/02 20:18:15 by ohaker           ###   ########.fr        #
+#    Updated: 2025/11/29 15:47:39 by ohaker           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
 CFLAGS = -pthread -Werror -Wextra -Wall
 SRC = $(addprefix src/, \
-	philo.c \
-	utils.c \
 	checks.c \
+	clean_and_threads.c \
+	more_utils.c \
+	philo.c \
 	routines.c \
-	clean_and_threads.c)
+	utils.c)
 OBJ = $(SRC:.c=.o)
 
 NONE		= \033[0m

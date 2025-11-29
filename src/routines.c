@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 16:31:32 by ohaker            #+#    #+#             */
-/*   Updated: 2025/11/26 22:35:01 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:45:55 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,74 +42,26 @@ int	philo_fork(t_philo *philo)
 	return (1);
 }
 
-// int	philo_fork(t_philo *philo)
-// {
-// 	pthread_mutex_t *first_fork;
-//     pthread_mutex_t *second_fork;
-
-// 	if (philo->id % 2 == 0)
-//     {
-//         first_fork = philo->left_fork;
-//         second_fork = philo->right_fork;
-//     }
-//     else
-//     {
-//         first_fork = philo->right_fork;
-//         second_fork = philo->left_fork;
-//     }
-//     pthread_mutex_lock(first_fork);
-//     printf_safe(philo, "has taken a fork");
-//     pthread_mutex_lock(second_fork);
-//     printf_safe(philo, "has taken a fork");
-// 	if (!check_alive_one(philo))
-// 	{
-// 		pthread_mutex_unlock(philo->left_fork);
-// 		pthread_mutex_unlock(philo->right_fork);
-// 		return (0);
-// 	}
-// 	return (1);
-// }
-
-// void	philo_eat(t_philo *philo)
-// {
-// 	if (philo->rules->must_eat_count == philo->meals_eaten)
-// 	{
-// 		pthread_mutex_unlock(philo->left_fork);
-// 		pthread_mutex_unlock(philo->right_fork);
-// 		return ;
-// 	}
-// 	gettimeofday(&philo->last_meal, NULL);
-// 	pthread_mutex_lock(&philo->philo_lock);
-// 	philo->meals_eaten += 1;
-// 	pthread_mutex_unlock(&philo->philo_lock);
-// 	printf_safe(philo, "is eating");
-// 	ft_usleep(philo->rules->time_to_eat, philo);
-// 	pthread_mutex_unlock(philo->left_fork);
-// 	pthread_mutex_unlock(philo->right_fork);
-// 	// pthread_mutex_lock(&philo->rules->meal_lock);
-// 	// if (!get_stop_sim(philo->rules))
-// 	// pthread_mutex_unlock(&philo->rules->meal_lock);
-// }
-
 void	philo_eat(t_philo *philo)
 {
-    if (philo->rules->must_eat_count == philo->meals_eaten)
-    {
-        pthread_mutex_unlock(philo->left_fork);
-        pthread_mutex_unlock(philo->right_fork);
-        return ;
-    }
-    pthread_mutex_lock(&philo->philo_lock);
-    gettimeofday(&philo->last_meal, NULL);
-    pthread_mutex_unlock(&philo->philo_lock);
-    printf_safe(philo, "is eating");
-    ft_usleep(philo->rules->time_to_eat, philo);
-    pthread_mutex_unlock(philo->left_fork);
-    pthread_mutex_unlock(philo->right_fork);
-    pthread_mutex_lock(&philo->philo_lock);
-    if (!get_stop_sim(philo->rules) && philo->meals_eaten < philo->rules->must_eat_count)
-        philo->meals_eaten += 1;
-    pthread_mutex_unlock(&philo->philo_lock);
+	if (philo->rules->must_eat_count == philo->meals_eaten)
+	{
+		pthread_mutex_unlock(philo->left_fork);
+		pthread_mutex_unlock(philo->right_fork);
+		return ;
+	}
+	pthread_mutex_lock(&philo->philo_lock);
+	gettimeofday(&philo->last_meal, NULL);
+	pthread_mutex_unlock(&philo->philo_lock);
+	printf_safe(philo, "is eating");
+	ft_usleep(philo->rules->time_to_eat, philo);
+	pthread_mutex_unlock(philo->left_fork);
+	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_lock(&philo->philo_lock);
+	if (!get_stop_sim(philo->rules)
+		&& philo->meals_eaten < philo->rules->must_eat_count)
+		philo->meals_eaten += 1;
+	pthread_mutex_unlock(&philo->philo_lock);
 }
 
 void	philo_sleep(t_philo *philo)

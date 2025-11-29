@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 18:53:57 by ohaker            #+#    #+#             */
-/*   Updated: 2025/11/26 20:40:38 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:41:06 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	*philo_routine(void *arg)
 	while (check_alive_one(philo) && (philo->rules->must_eat_count <= 0
 			|| philo->meals_eaten != philo->rules->must_eat_count))
 	{
-		// usleep(400);
+		usleep(400);
 		if (get_stop_sim(philo->rules) || philo_full(philo))
 			break ;
 		if (philo_fork(philo))

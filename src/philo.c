@@ -6,16 +6,16 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 20:51:15 by ohaker            #+#    #+#             */
-/*   Updated: 2025/11/26 20:38:51 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:57:19 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 #include <stdlib.h>
 
-int init_input(int argc, char **argv, t_rules *rules)
+int	init_input(int argc, char **argv, t_rules *rules)
 {
-	int x;
+	int	x;
 
 	x = 0;
 	rules->philo_count = ft_atoi(argv[1]);
@@ -26,8 +26,7 @@ int init_input(int argc, char **argv, t_rules *rules)
 		rules->must_eat_count = ft_atoi(argv[5]);
 	else if (argc == 5)
 		rules->must_eat_count = -1;
-	rules->forks = malloc(sizeof(pthread_mutex_t)
-		* rules->philo_count);
+	rules->forks = malloc(sizeof(pthread_mutex_t) * rules->philo_count);
 	if (!rules->forks)
 		error_msg("Memory allocation for forks failed.\n");
 	while (x < ft_atoi(argv[1]))
@@ -38,33 +37,6 @@ int init_input(int argc, char **argv, t_rules *rules)
 	pthread_mutex_init(&rules->simulation_lock, NULL);
 	return (0);
 }
-
-// int init_philos(t_philo *philo)
-// {
-// 	int x;
-
-// 	x = 0;
-// 	philo->rules->philos = malloc(sizeof(t_philo) * philo->rules->philo_count);
-// 	memset(philo->rules->philos, 0, sizeof(t_philo)
-// 		* philo->rules->philo_count);
-// 	if (!philo->rules->philos)
-// 		error_msg("Memory allocation of philos failes.\n");
-// 	gettimeofday(&philo->rules->start_time, NULL);
-// 	while (x < philo->rules->philo_count)
-// 	{
-// 		philo->rules->philos[x].id = x;
-// 		philo->rules->philos[x].alive = 1;
-// 		philo->rules->philos[x].meals_eaten = 0;
-// 		philo->rules->philos[x].rules = philo->rules;
-// 		gettimeofday(&philo->rules->philos[x].last_meal, NULL);
-// 		philo->rules->philos[x].left_fork = &philo->rules->forks[x];
-// 		philo->rules->philos[x].right_fork = &philo->rules->forks[(x + 1)
-// 			% philo->rules->philo_count];
-// 		pthread_mutex_init(&philo->rules->philos[x].philo_lock, NULL);
-// 		x++;
-// 	}
-// 	return (0);
-// }
 
 int	init_philos(t_rules *rules)
 {
@@ -106,26 +78,6 @@ int	eat_helper(t_rules *rules)
 	return (0);
 }
 
-// int main(int argc, char **argv)
-// {
-// 	t_rules *rules;
-
-// 	rules = malloc(sizeof(t_rules));
-// 	memset(&rules, 0, sizeof(t_rules));
-// 	if (!check_input(argc, argv) || init_input(argc, argv, &rules)
-// 		|| init_philos(&rules))
-// 		return (0);
-// 	// check_input(argc, argv);
-// 	// init_input(argc, argv, &rules);
-// 	// init_philos(&rules);
-// 	thread_create(&rules);
-// 	check_end(&rules);
-// 	thread_join(&rules);
-// 	// eat_helper(&philo);
-// 	clean_up(&rules);
-// 	return (0);
-// }
-
 int	main(int argc, char **argv)
 {
 	t_rules	*rules;
@@ -144,6 +96,5 @@ int	main(int argc, char **argv)
 	thread_join(rules);
 	eat_helper(rules);
 	clean_up(rules);
-	// free(rules);
 	return (0);
 }
