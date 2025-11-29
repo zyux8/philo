@@ -6,7 +6,7 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/07 20:28:20 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/25 18:04:31 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/26 20:40:11 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,42 +51,16 @@ long get_time_diff(struct timeval start)
 	return (time_diff);
 }
 
-// void	ft_usleep(long sleep, t_philo *philo)
-// {
-// 	long	start;
-// 	long	current;
-
-// 	start = get_time_diff(philo->rules->start_time);
-// 	while (1)
-// 	{
-// 		// pthread_mutex_lock(&philo->rules->simulation_lock);
-// 		// if (philo->rules->stop_simulation)
-// 		// {
-// 		// 	pthread_mutex_unlock(&philo->rules->simulation_lock);
-// 		// 	break;
-// 		// }
-// 		// pthread_mutex_unlock(&philo->rules->simulation_lock);
-
-// 		current = get_time_diff(philo->rules->start_time);
-// 		if (current - start >= sleep)
-// 			break;
-// 		usleep(100);
-// 	}
-// }
-
-void ft_usleep(long sleep, t_philo *philo)
+void ft_usleep(long time_to_wait, t_philo *philo)
 {
-    long start;
+    long start_time;
+    long target_time;
 
-	start = get_time_diff(philo->rules->start_time);
-    while (get_time_diff(philo->rules->start_time) - start < sleep)
-	{
-        if (get_stop_sim(philo->rules))
-            break;
-        usleep(100);
-    }
+    start_time = get_time_diff(philo->rules->start_time); 
+    target_time = start_time + time_to_wait;
+    while (get_time_diff(philo->rules->start_time) < target_time && !get_stop_sim(philo->rules)) 
+        usleep(200); 
 }
-
 
 void printf_safe(t_philo *philo, char *msg)
 {
@@ -94,7 +68,7 @@ void printf_safe(t_philo *philo, char *msg)
 	
 	time_diff = get_time_diff(philo->rules->start_time);
 	pthread_mutex_lock(&philo->rules->print_lock);
-	if (check_alive(philo->rules) && philo->rules->stop_simulation == 0)
+	if (get_stop_sim(philo->rules) == 0)
 		printf("%ld %d %s\n", time_diff, philo->id, msg);
 	pthread_mutex_unlock(&philo->rules->print_lock);
 }
@@ -114,4 +88,24 @@ int get_stop_sim(t_rules *rules)
     value = rules->stop_simulation;
     pthread_mutex_unlock(&rules->simulation_lock);
     return (value);
+}
+
+int philo_full(t_philo *philo)
+{
+	int full;
+
+	pthread_mutex_lock(&philo->philo_lock);
+	if (philo->meals_eaten >= philo->rules->must_eat_count && philo->rules->must_eat_count > 0)
+		full = 1;
+	else
+		full = 0;
+	pthread_mutex_unlock(&philo->philo_lock);
+	return (full);
+}
+
+long get_time_ms(void)
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
 }

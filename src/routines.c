@@ -6,88 +6,128 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/17 16:31:32 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/25 18:07:41 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/26 22:35:01 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-void philo_think(t_philo *philo)
+void	philo_think(t_philo *philo)
 {
-	long time_diff;
-
-	// time_diff = get_time_diff(philo->rules->start_time);
 	printf_safe(philo, "is thinking");
 }
 
-int philo_fork(t_philo *philo)
+int	philo_fork(t_philo *philo)
 {
-	long time_diff;
-	
-    if (philo->id % 2 == 0)
-    {
-        pthread_mutex_lock(philo->left_fork);
-        pthread_mutex_lock(philo->right_fork);
-    }
-    else
-    {
-        pthread_mutex_lock(philo->right_fork);
-        pthread_mutex_lock(philo->left_fork);
-    }
-	if (!check_alive(philo->rules))
+	if (philo->id % 2 == 0)
+	{
+		pthread_mutex_lock(philo->left_fork);
+		printf_safe(philo, "has taken a fork");
+		pthread_mutex_lock(philo->right_fork);
+		printf_safe(philo, "has taken a fork");
+	}
+	else
+	{
+		pthread_mutex_lock(philo->right_fork);
+		printf_safe(philo, "has taken a fork");
+		pthread_mutex_lock(philo->left_fork);
+		printf_safe(philo, "has taken a fork");
+	}
+	if (!check_alive_one(philo))
 	{
 		pthread_mutex_unlock(philo->left_fork);
 		pthread_mutex_unlock(philo->right_fork);
 		return (0);
 	}
-	// time_diff = get_time_diff(philo->rules->start_time);
-	printf_safe(philo, "has taken a fork");
-	printf_safe(philo, "has taken a fork");
 	return (1);
 }
 
-void philo_eat(t_philo *philo)
-{
-	long time_diff;
+// int	philo_fork(t_philo *philo)
+// {
+// 	pthread_mutex_t *first_fork;
+//     pthread_mutex_t *second_fork;
 
-	// time_diff = get_time_diff(philo->rules->start_time);
-	pthread_mutex_lock(&philo->rules->meal_lock);
-	gettimeofday(&philo->last_meal, NULL);
-	pthread_mutex_unlock(&philo->rules->meal_lock);
-	printf_safe(philo, "is eating");
-	ft_usleep(philo->rules->time_to_eat * 1000, philo);
-	// usleep(philo->rules->time_to_eat * 1000);
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
-	pthread_mutex_lock(&philo->rules->meal_lock);
-	philo->meals_eaten += 1;
-	pthread_mutex_unlock(&philo->rules->meal_lock);
+// 	if (philo->id % 2 == 0)
+//     {
+//         first_fork = philo->left_fork;
+//         second_fork = philo->right_fork;
+//     }
+//     else
+//     {
+//         first_fork = philo->right_fork;
+//         second_fork = philo->left_fork;
+//     }
+//     pthread_mutex_lock(first_fork);
+//     printf_safe(philo, "has taken a fork");
+//     pthread_mutex_lock(second_fork);
+//     printf_safe(philo, "has taken a fork");
+// 	if (!check_alive_one(philo))
+// 	{
+// 		pthread_mutex_unlock(philo->left_fork);
+// 		pthread_mutex_unlock(philo->right_fork);
+// 		return (0);
+// 	}
+// 	return (1);
+// }
+
+// void	philo_eat(t_philo *philo)
+// {
+// 	if (philo->rules->must_eat_count == philo->meals_eaten)
+// 	{
+// 		pthread_mutex_unlock(philo->left_fork);
+// 		pthread_mutex_unlock(philo->right_fork);
+// 		return ;
+// 	}
+// 	gettimeofday(&philo->last_meal, NULL);
+// 	pthread_mutex_lock(&philo->philo_lock);
+// 	philo->meals_eaten += 1;
+// 	pthread_mutex_unlock(&philo->philo_lock);
+// 	printf_safe(philo, "is eating");
+// 	ft_usleep(philo->rules->time_to_eat, philo);
+// 	pthread_mutex_unlock(philo->left_fork);
+// 	pthread_mutex_unlock(philo->right_fork);
+// 	// pthread_mutex_lock(&philo->rules->meal_lock);
+// 	// if (!get_stop_sim(philo->rules))
+// 	// pthread_mutex_unlock(&philo->rules->meal_lock);
+// }
+
+void	philo_eat(t_philo *philo)
+{
+    if (philo->rules->must_eat_count == philo->meals_eaten)
+    {
+        pthread_mutex_unlock(philo->left_fork);
+        pthread_mutex_unlock(philo->right_fork);
+        return ;
+    }
+    pthread_mutex_lock(&philo->philo_lock);
+    gettimeofday(&philo->last_meal, NULL);
+    pthread_mutex_unlock(&philo->philo_lock);
+    printf_safe(philo, "is eating");
+    ft_usleep(philo->rules->time_to_eat, philo);
+    pthread_mutex_unlock(philo->left_fork);
+    pthread_mutex_unlock(philo->right_fork);
+    pthread_mutex_lock(&philo->philo_lock);
+    if (!get_stop_sim(philo->rules) && philo->meals_eaten < philo->rules->must_eat_count)
+        philo->meals_eaten += 1;
+    pthread_mutex_unlock(&philo->philo_lock);
 }
 
-void philo_sleep(t_philo *philo)
+void	philo_sleep(t_philo *philo)
 {
-	long time_diff;
-
-	// time_diff = get_time_diff(philo->rules->start_time);
 	printf_safe(philo, "is sleeping");
-	ft_usleep(philo->rules->time_to_sleep * 1000, philo);
-	// usleep(philo->rules->time_to_sleep * 1000);
+	ft_usleep(philo->rules->time_to_sleep, philo);
 }
 
-void *one_philo(void *arg)
+void	*one_philo(void *arg)
 {
-	t_philo *philo = (t_philo *)arg;
-	long time_diff;
+	t_philo	*philo;
 
+	philo = (t_philo *)arg;
 	pthread_mutex_lock(philo->left_fork);
-	time_diff = get_time_diff(philo->rules->start_time);
 	printf_safe(philo, "has taken a fork");
-	// ft_usleep(philo->rules->time_to_die * 1000, philo);
-	usleep(philo->rules->time_to_die * 1000);
+	ft_usleep(philo->rules->time_to_die, philo);
 	pthread_mutex_unlock(philo->left_fork);
-	time_diff = get_time_diff(philo->rules->start_time);
 	printf_safe(philo, "died");
+	set_stop_sim(philo->rules);
 	pthread_exit(NULL);
 }
-
-//more alive checks

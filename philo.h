@@ -6,20 +6,20 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/03 20:46:51 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/25 18:07:35 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/26 20:07:41 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PHILO_H
 # define PHILO_H
 
-# include <sys/time.h>
-# include <stdio.h>
+# include <pthread.h>
 # include <stdint.h>
-# include <unistd.h>
+# include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
-# include <pthread.h>
+# include <sys/time.h>
+# include <unistd.h>
 
 typedef struct s_rules
 {
@@ -30,13 +30,13 @@ typedef struct s_rules
 	int				must_eat_count;
 	int				stop_simulation;
 	pthread_mutex_t	*forks;
-	pthread_mutex_t alive_lock;
-	pthread_mutex_t meal_lock;
+	pthread_mutex_t	alive_lock;
+	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	print_lock;
 	pthread_mutex_t	simulation_lock;
 	struct timeval	start_time;
 	struct s_philo	*philos;
-}	t_rules;
+}					t_rules;
 
 typedef struct s_philo
 {
@@ -47,35 +47,42 @@ typedef struct s_philo
 	pthread_t		thread_id;
 	pthread_mutex_t	*left_fork;
 	pthread_mutex_t	*right_fork;
+	pthread_mutex_t	philo_lock;
 	t_rules			*rules;
-}	t_philo;
+}					t_philo;
 
-//utils.c
-int	ft_atoi(const char *str);
-void error_msg(char *err_str);
-int ft_isdigit(char c);
-long get_time_diff(struct timeval start);
-void ft_usleep(long sleep, t_philo *philo);
-void printf_safe(t_philo *philo, char *msg);
-void set_stop_sim(t_rules *rules);
-int get_stop_sim(t_rules *rules);
+// utils.c
+int					ft_atoi(const char *str);
+void				error_msg(char *err_str);
+int					ft_isdigit(char c);
+long				get_time_diff(struct timeval start);
+void				ft_usleep(long sleep, t_philo *philo);
+void				printf_safe(t_philo *philo, char *msg);
+void				set_stop_sim(t_rules *rules);
+int					get_stop_sim(t_rules *rules);
+int					philo_full(t_philo *philo);
+long				get_time_ms(void);
 
-//checks.c
-int check_input(int argc, char **argv);
-int check_alive(t_rules *rules);
-int check_end(t_rules *rules);
+// checks.c
+int					check_input(int argc, char **argv);
+int					check_alive_one(t_philo *philo);
+int					check_alive(t_rules *rules);
+// int					check_end(t_philo *philo);
+int					check_end(t_rules *rules);
+int					all_eaten(t_rules *rules);
 
-//routines.c
-void philo_think(t_philo *philo);
-int philo_fork(t_philo *philo);
-void philo_eat(t_philo *philo);
-void philo_sleep(t_philo *philo);
-void *one_philo(void *arg);
+// routines.c
+void				philo_think(t_philo *philo);
+int					philo_fork(t_philo *philo);
+void				philo_eat(t_philo *philo);
+void				philo_sleep(t_philo *philo);
+void				*one_philo(void *arg);
 
-//clean_and_threads.c
-int clean_up(t_philo *philo);
-int thread_create(t_rules *rules);
-int thread_join(t_rules *rules);
-void *philo_routine(void *arg);
+// clean_and_threads.c
+// int					clean_up(t_philo *philo);
+int					clean_up(t_rules *rules);
+int					thread_create(t_rules *rules);
+int					thread_join(t_rules *rules);
+void				*philo_routine(void *arg);
 
 #endif

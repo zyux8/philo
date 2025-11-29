@@ -6,16 +6,16 @@
 /*   By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 16:24:51 by ohaker            #+#    #+#             */
-/*   Updated: 2025/08/26 19:06:49 by ohaker           ###   ########.fr       */
+/*   Updated: 2025/11/26 22:05:24 by ohaker           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../philo.h"
 
-int check_input(int argc, char **argv)
+int	check_input(int argc, char **argv)
 {
-	int x;
-	int y;
+	int	x;
+	int	y;
 
 	if (argc < 5 || argc > 6)
 		error_msg("Invalid number of arguments.\n");
@@ -38,63 +38,100 @@ int check_input(int argc, char **argv)
 	return (0);
 }
 
-int check_alive(t_rules *rules)
+int	check_alive_one(t_philo *philo)
 {
-	int x;
-	long time_diff;
-	
+	long	time_diff;
+
+	pthread_mutex_lock(&philo->rules->meal_lock);
+	time_diff = get_time_diff(philo->last_meal);
+	pthread_mutex_unlock(&philo->rules->meal_lock);
+	if (time_diff > philo->rules->time_to_die
+		&& philo->meals_eaten != philo->rules->must_eat_count)
+	{
+		// printf_safe(philo, "died");
+		set_stop_sim(philo->rules);
+		return (0);
+	}
+	return (1);
+}
+
+// int check_alive(t_rules *rules)
+// {
+// 	int x;
+// 	long time_diff;
+
+// 	x = 0;
+// 	pthread_mutex_lock(&rules->alive_lock);
+// 	while (x < rules->philo_count)
+// 	{
+// 		pthread_mutex_lock(&rules->meal_lock);
+// 		time_diff = get_time_diff(rules->philos[x].last_meal);
+// 		pthread_mutex_unlock(&rules->meal_lock);
+// 		if (time_diff > rules->time_to_die)
+// 		{
+// 			printf_safe(&rules->philos[x], "di3d");
+// 			set_stop_sim(rules);
+// 			pthread_mutex_unlock(&rules->alive_lock);
+// 			return (0);
+// 		}
+// 		x++;
+// 	}
+// 	pthread_mutex_unlock(&rules->alive_lock);
+// 	return (1);
+// }
+
+int	check_alive(t_rules *rules)
+{
+	int		x;
+	long	time_diff;
+
 	x = 0;
-	pthread_mutex_lock(&rules->alive_lock);
 	while (x < rules->philo_count)
 	{
-		pthread_mutex_lock(&rules->meal_lock);
+		pthread_mutex_lock(&rules->philos[x].philo_lock);
 		time_diff = get_time_diff(rules->philos[x].last_meal);
-		pthread_mutex_unlock(&rules->meal_lock);
+		pthread_mutex_unlock(&rules->philos[x].philo_lock);
 		if (time_diff > rules->time_to_die)
 		{
-			printf_safe(&rules->philos[x], "di3d");
+			printf_safe(&rules->philos[x], "died");
 			set_stop_sim(rules);
-			pthread_mutex_unlock(&rules->alive_lock);
 			return (0);
 		}
 		x++;
 	}
-	pthread_mutex_unlock(&rules->alive_lock);
 	return (1);
 }
 
-int all_eaten(t_rules *rules)
+int	all_eaten(t_rules *rules)
 {
-	int x;
+	int	x;
 
 	x = 0;
 	while (x < rules->philo_count)
 	{
-		pthread_mutex_lock(&rules->meal_lock);
+		pthread_mutex_lock(&rules->philos[x].philo_lock);
 		if (rules->philos[x].meals_eaten < rules->must_eat_count)
 		{
-			pthread_mutex_unlock(&rules->meal_lock);
+			pthread_mutex_unlock(&rules->philos[x].philo_lock);
 			return (0);
 		}
-		pthread_mutex_unlock(&rules->meal_lock);
+		pthread_mutex_unlock(&rules->philos[x].philo_lock);
 		x++;
 	}
 	return (1);
 }
 
-int check_end(t_rules *rules)
+int	check_end(t_rules *rules)
 {
-	long time_diff;
-
 	while (!get_stop_sim(rules))
 	{
 		check_alive(rules);
-		if (rules->must_eat_count > 0 && all_eaten(rules) )
+		if (rules->must_eat_count > 0 && all_eaten(rules))
 		{
 			set_stop_sim(rules);
 			return (0);
 		}
-		usleep(10000);
+		usleep(5000);
 	}
 	return (0);
 }

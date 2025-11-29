@@ -6,14 +6,14 @@
 #    By: ohaker <ohaker@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/07/03 20:40:19 by ohaker            #+#    #+#              #
-#    Updated: 2025/08/22 22:27:10 by ohaker           ###   ########.fr        #
+#    Updated: 2025/09/02 20:18:15 by ohaker           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = philo
-CFLAGS = -pthread #-Werror -Wextra -Wall
+CFLAGS = -pthread -Werror -Wextra -Wall
 SRC = $(addprefix src/, \
-	main.c \
+	philo.c \
 	utils.c \
 	checks.c \
 	routines.c \
